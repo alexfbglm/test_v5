@@ -54,12 +54,14 @@ def process_pdf(file):
 # Streamlit app
 st.title("RAG Chatbot with OpenAI GPT-3.5 Turbo and FAISS")
 
+# Allow the user to upload a PDF file
 uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
 
 if uploaded_file is not None:
     # Process PDF and cache results
     chunks, index = process_pdf(uploaded_file)
     
+    # Allow the user to input a question
     user_input = st.text_input("Ask a question:")
 
     if user_input:
