@@ -1,5 +1,5 @@
 transformers
 sentence-transformers
-faiss-cpu
+chromadb
 PyPDF2
 streamlit
