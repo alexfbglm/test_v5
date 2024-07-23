@@ -3,18 +3,15 @@ import PyPDF2
 from sentence_transformers import SentenceTransformer
 import faiss
 import numpy as np
-from transformers import AutoModelForCausalLM, AutoTokenizer
-import torch
+import openai
+
+# Set your OpenAI API key
+openai.api_key = st.secrets["openai"]["api_key"]
 
 # Load SentenceTransformer model
 embedder = SentenceTransformer('all-MiniLM-L6-v2')
 
-# Load LLM model and tokenizer
-model_name = "EleutherAI/gpt-neo-1.3B"
-tokenizer = AutoTokenizer.from_pretrained(model_name)
-model = AutoModelForCausalLM.from_pretrained(model_name)
-
-# Extract text from PDF
+# Function to extract text from PDF
 def extract_text_from_pdf(pdf_file):
     pdf_reader = PyPDF2.PdfFileReader(pdf_file)
     text = ""
@@ -23,7 +20,7 @@ def extract_text_from_pdf(pdf_file):
         text += page.extract_text()
     return text
 
-# Create chunks with overlap
+# Function to create chunks with overlap
 def create_chunks(text, chunk_size=512, overlap=50):
     words = text.split()
     chunks = []
@@ -55,7 +52,7 @@ def process_pdf(file):
     return chunks, index
 
 # Streamlit app
-st.title("RAG Chatbot with GPT-Neo-1.3B and FAISS")
+st.title("RAG Chatbot with OpenAI GPT-3.5 Turbo and FAISS")
 
 uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
 
@@ -72,9 +69,11 @@ if uploaded_file is not None:
         # Create context for the LLM
         context = " ".join(similar_chunks)
         
-        # Generate response using the LLM
-        input_ids = tokenizer.encode(context + user_input, return_tensors='pt')
-        response_ids = model.generate(input_ids, max_length=200)
-        response = tokenizer.decode(response_ids[0], skip_special_tokens=True)
+        # Generate response using the OpenAI API
+        response = openai.Completion.create(
+            engine="gpt-3.5-turbo",
+            prompt=context + "\n\nQ: " + user_input + "\nA:",
+            max_tokens=200
+        )
         
-        st.write(response)
+        st.write(response.choices[0].text.strip())
