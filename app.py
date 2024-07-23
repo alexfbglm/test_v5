@@ -6,7 +6,7 @@ import streamlit as st
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
 # Load the model and tokenizer
-model_name = "mistralai/Mistral-7B-Instruct-v0.2"
+model_name = "EleutherAI/gpt-neo-1.3B"
 tokenizer = AutoTokenizer.from_pretrained(model_name)
 model = AutoModelForCausalLM.from_pretrained(model_name)
 
@@ -26,7 +26,7 @@ def get_similar_chunks(query, k=5):
     return [chunks[i] for i in I[0]]
 
 # Streamlit app
-st.title("RAG Chatbot with Mistral-7B-Instruct-v0.2")
+st.title("RAG Chatbot with GPT-Neo-1.3B")
 
 uploaded_file = st.file_uploader("Upload a PDF file", type="pdf")
 
@@ -60,4 +60,3 @@ if uploaded_file is not None:
         response = tokenizer.decode(response_ids[0], skip_special_tokens=True)
         
         st.write(response)
-
